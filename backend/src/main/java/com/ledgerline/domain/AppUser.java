@@ -60,6 +60,14 @@ public class AppUser {
         return email;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }

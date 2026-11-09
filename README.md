@@ -79,3 +79,13 @@ Read-only history and audit endpoints:
 - `GET /api/transfers` returns a customer's sent and received transfers.
   Admins and auditors may view the complete transfer history.
 - `GET /api/audit-logs` is restricted to admins and auditors.
+
+Administrative endpoints:
+
+- `GET /api/admin/users` lists users for admins.
+- `POST /api/admin/users/{email}/roles` assigns `CUSTOMER`, `ADMIN`, or
+  `AUDITOR` to an existing user and records an audit event.
+
+The first administrator must be provisioned through a controlled database
+operation or deployment bootstrap process; public registration never grants
+privileged roles.

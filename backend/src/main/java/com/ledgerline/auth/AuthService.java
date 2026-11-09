@@ -4,6 +4,7 @@ import com.ledgerline.domain.AppUser;
 import com.ledgerline.domain.RefreshToken;
 import com.ledgerline.domain.Role;
 import com.ledgerline.domain.RoleName;
+import com.ledgerline.account.AccountService;
 import com.ledgerline.repository.AppUserRepository;
 import com.ledgerline.repository.RefreshTokenRepository;
 import com.ledgerline.repository.RoleRepository;
@@ -32,6 +33,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final AccountService accountService;
     private final Duration refreshTokenTtl;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -42,6 +44,7 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
+            AccountService accountService,
             @Value("${spring.security.jwt.refresh-token-ttl}") Duration refreshTokenTtl) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -49,6 +52,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.accountService = accountService;
         this.refreshTokenTtl = refreshTokenTtl;
     }
 
@@ -64,7 +68,9 @@ public class AuthService {
                 request.email().trim().toLowerCase(),
                 passwordEncoder.encode(request.password()));
         user.getRoles().add(customerRole);
-        return issueTokens(userRepository.save(user));
+        AppUser savedUser = userRepository.save(user);
+        accountService.createForCustomer(savedUser.getEmail(), savedUser);
+        return issueTokens(savedUser);
     }
 
     @Transactional

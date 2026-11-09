@@ -68,6 +68,10 @@ public class Account {
         return balance;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public AccountStatus getStatus() {
         return status;
     }

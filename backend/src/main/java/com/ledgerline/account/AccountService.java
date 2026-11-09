@@ -35,7 +35,7 @@ public class AccountService {
 
     @Transactional
     public AccountDtos.AccountResponse createForCustomer(String ownerEmail, AppUser actor) {
-        AppUser owner = userRepository.findByEmailIgnoreCase(ownerEmail)
+        AppUser owner = userRepository.findByEmailIgnoreCaseForUpdate(ownerEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Account owner was not found"));
         if (accountRepository.countByOwnerId(owner.getId()) >= MAX_ACCOUNTS_PER_USER) {
             throw new IllegalStateException("Customer cannot own more than three accounts");
@@ -56,7 +56,7 @@ public class AccountService {
     @Transactional
     public AccountDtos.AccountResponse changeStatus(
             String accountNumber, AccountStatus requestedStatus, AppUser actor) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
+        Account account = accountRepository.findByAccountNumberForUpdate(accountNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Account was not found"));
         if (requestedStatus == AccountStatus.CLOSED && account.getBalance().signum() != 0) {
             throw new IllegalStateException("Account must have a zero balance before closure");

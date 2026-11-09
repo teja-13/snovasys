@@ -183,3 +183,30 @@ project history and must not claim work that was not performed.
   parameter-property issues; those were corrected. Added a separate frontend
   GitHub Actions build workflow.
 - **Commit reference:** Pending frontend integration commit.
+
+## Entry 12 — 2026-11-09 — Backend-first completion focus
+
+- **Developer request:** Continue completing the application with tests and
+  supporting work, focusing on the backend now and postponing further frontend
+  work.
+- **AI contribution:** Audited the backend against the agreed MVP and found
+  that registration created a user but did not create the required initial
+  financial account. Updated registration to create one zero-balance INR
+  account through the existing account service and added a PostgreSQL-backed
+  integration test.
+- **Verification or correction:** This backend-first pass deliberately leaves
+  the already-built frontend unchanged. Further backend work still includes
+  controlled admin bootstrap/role assignment and reversal lifecycle behavior.
+- **Commit reference:** Pending backend completion commit.
+
+## Entry 13 — 2026-11-09 — Administrative role management
+
+- **Developer context:** Continue backend completion while postponing frontend
+  work.
+- **AI contribution:** Added admin-only user listing and role-assignment
+  endpoints for CUSTOMER, ADMIN, and AUDITOR, with database locking and audit
+  records. Account creation and status changes now lock the relevant user or
+  account row to protect lifecycle rules under concurrent requests.
+- **Verification:** Added an admin role-assignment integration test. Full
+  backend verification passed with 12 tests.
+- **Commit reference:** Pending backend administration commit.
