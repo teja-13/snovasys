@@ -50,4 +50,28 @@ public class AuditLog {
         this.details = details;
         this.createdAt = Instant.now();
     }
+
+    public AppUser getActor() {
+        return actor;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getDetails() {
+        return details;
+    }
 }

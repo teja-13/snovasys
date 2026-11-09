@@ -51,3 +51,9 @@ Internal transfers:
   one database transaction.
 - Reusing an idempotency key with different transfer data returns `409
   Conflict`.
+
+Read-only history and audit endpoints:
+
+- `GET /api/transfers` returns a customer's sent and received transfers.
+  Admins and auditors may view the complete transfer history.
+- `GET /api/audit-logs` is restricted to admins and auditors.

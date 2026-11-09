@@ -155,3 +155,16 @@ project history and must not claim work that was not performed.
   schema limit. The prefix was removed rather than expanding the schema
   unnecessarily. Full `./mvnw --batch-mode verify` then passed with 10 tests.
 - **Commit reference:** Pending transfer commit.
+
+## Entry 10 — 2026-11-09 — History and audit access
+
+- **Developer context:** Confirmed that the BalanceVault description is
+  reference material while LedgerLine must use its independently agreed Java,
+  Spring Boot, PostgreSQL, and financial-integrity design.
+- **AI contribution:** Added customer transfer-history queries restricted by
+  account ownership, complete transfer-history access for admins and
+  auditors, and a read-only audit-log endpoint restricted to admins and
+  auditors. Added response DTOs and service-layer mappings.
+- **Verification:** The full `./mvnw --batch-mode verify` command passed with
+  10 tests and zero failures or errors.
+- **Commit reference:** Pending history and audit commit.
