@@ -104,4 +104,5 @@ project history and must not claim work that was not performed.
   Nimbus JWT encoder call and a missing `HexFormat` import; both were corrected.
   Focused password and refresh-token lifecycle tests were added. Full
   PostgreSQL-backed context testing still depends on a running database.
-- **Commit reference:** Pending authentication commit.
+- **Commit reference:** `9df47e8 feat: add JWT authentication and roles` (local;
+  push requires GitHub authentication in this environment).
