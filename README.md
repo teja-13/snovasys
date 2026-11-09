@@ -138,6 +138,9 @@ cd ../frontend && npm ci && npm run lint && npm run build
 
 Use only forward Flyway migrations for schema changes. Never reset persistent
 volumes or use destructive database commands in local or deployed environments.
+Migration V7 adds database triggers that reject updates and deletes to ledger
+entries and audit logs; corrections must be represented by new compensating
+records.
 
 The repository includes production-oriented Dockerfiles at
 `backend/Dockerfile` and `frontend/Dockerfile` for the future ECR/Kubernetes
