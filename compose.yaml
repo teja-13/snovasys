@@ -1,19 +1,40 @@
 services:
   postgres:
+    container_name: ledgerline-postgres
     image: postgres:18
     environment:
       POSTGRES_DB: ledgerline
       POSTGRES_USER: ledgerline
-      POSTGRES_PASSWORD: ledgerline
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
     volumes:
       - ledgerline-postgres-data:/var/lib/postgresql
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ledgerline -d ledgerline"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  backend:
+    image: 051131628807.dkr.ecr.ap-southeast-2.amazonaws.com/ledgerline-backend:${LEDGERLINE_IMAGE_TAG:?LEDGERLINE_IMAGE_TAG must be set in .env}
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ledgerline
+      SPRING_DATASOURCE_USERNAME: ledgerline
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: 051131628807.dkr.ecr.ap-southeast-2.amazonaws.com/ledgerline-frontend:${LEDGERLINE_IMAGE_TAG:?LEDGERLINE_IMAGE_TAG must be set in .env}
+    ports:
+      - "80:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
   ledgerline-postgres-data:

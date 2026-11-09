@@ -2,9 +2,9 @@ spring:
   application:
     name: ledgerline-backend
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ledgerline}
-    username: ${DB_USERNAME:ledgerline}
-    password: ${DB_PASSWORD:ledgerline}
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://localhost:5432/ledgerline}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:ledgerline}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:ledgerline}}
   jpa:
     hibernate:
       ddl-auto: validate

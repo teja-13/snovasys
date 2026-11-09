@@ -11,7 +11,10 @@ RUN npm run build
 
 FROM nginx:1.29-alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /workspace/dist /usr/share/nginx/html
 
-EXPOSE 80
+USER nginx
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]

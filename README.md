@@ -90,6 +90,22 @@ The first administrator must be provisioned through a controlled database
 operation or deployment bootstrap process; public registration never grants
 privileged roles.
 
+## Docker Compose deployment
+
+The root `compose.yaml` runs PostgreSQL 18, the backend, and the frontend on
+the same Docker network. PostgreSQL uses the persistent
+`ledgerline-postgres-data` volume and is not published to the host. The backend
+waits for PostgreSQL's health check before starting.
+
+For local or EC2 deployment, copy `.env.example` to `.env` and set strong
+values for `POSTGRES_PASSWORD` and `JWT_SECRET`. The `.env` file is ignored by
+Git. Set `CORS_ALLOWED_ORIGINS` and `VITE_API_URL` to match the public
+deployment URLs when they differ from localhost, then run:
+
+```bash
+docker compose up -d --build
+```
+
 ## Continuous integration
 
 GitHub Actions runs the backend and frontend checks on pushes to `main` and on
