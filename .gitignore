@@ -1,0 +1,17 @@
+# Java / Maven
+backend/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/mcp.json
+
+# OS
+.DS_Store
