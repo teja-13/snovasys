@@ -122,3 +122,21 @@ project history and must not claim work that was not performed.
 - **Verification or correction:** Added a format contract test. Database-backed
   account service tests remain part of the next validation pass.
 - **Commit reference:** Pending account-management commit.
+
+## Entry 8 — 2026-11-09 — CI schema validation fix
+
+- **Developer request:** Fix the GitHub Actions backend failure caused by
+  Hibernate finding PostgreSQL `CHAR(3)` for currency while the JPA mappings
+  expected `VARCHAR(3)`. Run the complete `./mvnw --batch-mode verify` command
+  and do not disable schema validation.
+- **AI contribution:** Inspected the entities, Flyway migrations, JPA
+  configuration, tests, and Compose setup. Added forward-only migration V3 to
+  convert both `accounts.currency` and `transfers.currency` to `VARCHAR(3)`
+  using `btrim(currency)`, preserving the logical currency values and existing
+  constraints. Added migration contract coverage and corrected the PostgreSQL
+  18 Compose volume target.
+- **Verification:** PostgreSQL reported both currency columns as
+  `character varying(3)`. Flyway applied migrations V1 through V3, Hibernate
+  schema validation completed, and `./mvnw --batch-mode verify` passed with 7
+  tests and zero failures or errors.
+- **Commit reference:** Pending CI schema-fix commit.

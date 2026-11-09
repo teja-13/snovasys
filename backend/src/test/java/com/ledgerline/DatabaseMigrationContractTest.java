@@ -30,11 +30,29 @@ class DatabaseMigrationContractTest {
         assertTrue(migration.contains("'AUDITOR'"));
     }
 
+    @Test
+    void currencyMigrationUsesVariableLengthCharacterColumns() throws IOException {
+        String migration = readCurrencyMigration();
+
+        assertTrue(migration.contains("ALTER COLUMN currency TYPE VARCHAR(3)"));
+        assertTrue(migration.contains("USING btrim(currency)"));
+    }
+
     private String readMigration() throws IOException {
         try (InputStream input = getClass().getResourceAsStream(
                 "/db/migration/V1__create_initial_schema.sql")) {
             if (input == null) {
                 throw new IOException("Initial database migration was not found");
+            }
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    private String readCurrencyMigration() throws IOException {
+        try (InputStream input = getClass().getResourceAsStream(
+                "/db/migration/V3__use_varchar_for_currency_codes.sql")) {
+            if (input == null) {
+                throw new IOException("Currency type migration was not found");
             }
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
