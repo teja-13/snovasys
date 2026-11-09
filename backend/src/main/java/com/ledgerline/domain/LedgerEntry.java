@@ -26,9 +26,13 @@ public class LedgerEntry {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "transfer_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transfer_id")
     private Transfer transfer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "deposit_id")
+    private Deposit deposit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "account_id", nullable = false)
@@ -49,6 +53,16 @@ public class LedgerEntry {
 
     public LedgerEntry(Transfer transfer, Account account, LedgerEntryType entryType, BigDecimal amount) {
         this.transfer = transfer;
+        this.deposit = null;
+        this.account = account;
+        this.entryType = entryType;
+        this.amount = amount;
+        this.createdAt = Instant.now();
+    }
+
+    public LedgerEntry(Deposit deposit, Account account, LedgerEntryType entryType, BigDecimal amount) {
+        this.transfer = null;
+        this.deposit = deposit;
         this.account = account;
         this.entryType = entryType;
         this.amount = amount;

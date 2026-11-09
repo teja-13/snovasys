@@ -35,6 +35,12 @@ public class AccountController {
         return accountService.findOwnedBy(currentUser(authentication));
     }
 
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUDITOR')")
+    public List<AccountDtos.AccountResponse> allAccounts() {
+        return accountService.findAll();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('CUSTOMER')")

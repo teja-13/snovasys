@@ -43,6 +43,22 @@ public class AdminController {
                 email, request.role(), currentUser(authentication));
     }
 
+    @PostMapping("/auditors")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AdminDtos.UserResponse createAuditor(
+            @Valid @RequestBody AdminDtos.CreateAuditorRequest request,
+            Authentication authentication) {
+        return adminService.createAuditor(request, currentUser(authentication));
+    }
+
+    @PostMapping("/users/{email}/active")
+    public AdminDtos.UserResponse setActive(
+            @PathVariable String email,
+            @Valid @RequestBody AdminDtos.ActiveRequest request,
+            Authentication authentication) {
+        return adminService.setActive(email, request.active(), currentUser(authentication));
+    }
+
     private AppUser currentUser(Authentication authentication) {
         return userRepository.findById(java.util.UUID.fromString(authentication.getName()))
                 .orElseThrow(() -> new IllegalStateException("Authenticated user was not found"));

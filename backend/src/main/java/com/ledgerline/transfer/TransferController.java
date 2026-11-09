@@ -34,7 +34,7 @@ public class TransferController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN', 'AUDITOR')")
-    public List<TransferDtos.TransferResponse> history(Authentication authentication) {
+    public List<TransactionDtos.TransactionResponse> history(Authentication authentication) {
         AppUser user = currentUser(authentication);
         return authentication.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"))

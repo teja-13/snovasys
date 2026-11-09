@@ -13,12 +13,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,6 +38,7 @@ public class SecurityConfig {
         return email -> userRepository.findByEmailIgnoreCase(email)
                 .map(user -> org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
                         .password(user.getPasswordHash())
+                        .disabled(!user.isActive())
                         .authorities(user.getRoles().stream()
                                 .map(role -> "ROLE_" + role.getName().name())
                                 .toArray(String[]::new))
@@ -61,12 +64,29 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName("roles");
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
+    public JwtAuthenticationConverter jwtAuthenticationConverter(AppUserRepository userRepository) {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+                String subject = jwt.getSubject();
+                if (subject == null || subject.isBlank()) {
+                    throw new BadCredentialsException("Authenticated user was not found");
+                }
+                java.util.UUID userId;
+                try {
+                    userId = java.util.UUID.fromString(subject);
+                } catch (IllegalArgumentException exception) {
+                    throw new BadCredentialsException("Authenticated user was not found", exception);
+                }
+                AppUser user = userRepository.findByIdWithRoles(userId)
+                        .orElseThrow(() -> new BadCredentialsException("Authenticated user was not found"));
+                if (!user.isActive()) {
+                    throw new BadCredentialsException("User account is inactive");
+                }
+                return user.getRoles().stream()
+                        .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(
+                                "ROLE_" + role.getName().name()))
+                        .toList();
+        });
         return converter;
     }
 

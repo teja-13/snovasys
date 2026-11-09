@@ -1,6 +1,7 @@
 package com.ledgerline;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ledgerline.admin.AdminService;
 import com.ledgerline.admin.AdminDtos;
@@ -50,5 +51,34 @@ class AdminRoleIntegrationTest {
         assertTrue(response.roles().contains(RoleName.AUDITOR));
         assertTrue(userRepository.findById(target.getId()).orElseThrow().getRoles().stream()
                 .anyMatch(role -> role.getName() == RoleName.AUDITOR));
+    }
+
+    @Test
+    void auditorCannotBeAssignedCustomerRole() {
+        AppUser actor = userRepository.save(new AppUser(
+                "Administrator", "admin-" + UUID.randomUUID() + "@example.com", "hash"));
+        AppUser target = userRepository.save(new AppUser(
+                "Auditor", "auditor-" + UUID.randomUUID() + "@example.com", "hash"));
+        target.getRoles().add(roleRepository.findByName(RoleName.AUDITOR).orElseThrow());
+        userRepository.save(target);
+
+        assertThrows(IllegalStateException.class,
+                () -> adminService.assignRole(target.getEmail(), RoleName.CUSTOMER, actor));
+    }
+
+    @Test
+    void assignedRolesAreMutuallyExclusive() {
+        AppUser actor = userRepository.save(new AppUser(
+                "Administrator", "admin-" + UUID.randomUUID() + "@example.com", "hash"));
+        AppUser target = userRepository.save(new AppUser(
+                "Customer", "customer-" + UUID.randomUUID() + "@example.com", "hash"));
+        target.getRoles().add(roleRepository.findByName(RoleName.CUSTOMER).orElseThrow());
+        userRepository.save(target);
+
+        AdminDtos.UserResponse response =
+                adminService.assignRole(target.getEmail(), RoleName.AUDITOR, actor);
+
+        assertTrue(response.roles().contains(RoleName.AUDITOR));
+        assertTrue(response.roles().stream().noneMatch(role -> role == RoleName.CUSTOMER));
     }
 }

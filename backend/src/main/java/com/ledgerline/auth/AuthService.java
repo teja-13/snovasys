@@ -88,6 +88,10 @@ public class AuthService {
         RefreshToken oldToken = refreshTokenRepository.findByTokenHash(hash(rawToken))
                 .filter(token -> token.isUsableAt(Instant.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Refresh token is invalid or expired"));
+        if (!oldToken.getUser().isActive()) {
+            oldToken.revoke(Instant.now());
+            throw new IllegalArgumentException("User account is inactive");
+        }
         oldToken.revoke(Instant.now());
         return issueTokens(oldToken.getUser());
     }
@@ -99,6 +103,9 @@ public class AuthService {
     }
 
     private AuthDtos.TokenResponse issueTokens(AppUser user) {
+        if (!user.isActive()) {
+            throw new IllegalArgumentException("User account is inactive");
+        }
         JwtService.AccessToken accessToken = jwtService.issue(user);
         String rawRefreshToken = randomToken();
         Instant refreshExpiresAt = Instant.now().plus(refreshTokenTtl);

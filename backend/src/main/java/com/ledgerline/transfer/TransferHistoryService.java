@@ -1,8 +1,12 @@
 package com.ledgerline.transfer;
 
 import com.ledgerline.domain.AppUser;
+import com.ledgerline.domain.Deposit;
 import com.ledgerline.domain.Transfer;
+import com.ledgerline.repository.DepositRepository;
 import com.ledgerline.repository.TransferRepository;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,29 +15,53 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferHistoryService {
 
     private final TransferRepository transferRepository;
+    private final DepositRepository depositRepository;
 
-    public TransferHistoryService(TransferRepository transferRepository) {
+    public TransferHistoryService(TransferRepository transferRepository, DepositRepository depositRepository) {
         this.transferRepository = transferRepository;
+        this.depositRepository = depositRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<TransferDtos.TransferResponse> findForCustomer(AppUser user) {
-        return transferRepository.findHistoryForUser(user.getId())
-                .stream().map(this::toResponse).toList();
+    public List<TransactionDtos.TransactionResponse> findForCustomer(AppUser user) {
+        return combine(transferRepository.findHistoryForUser(user.getId()),
+                depositRepository.findHistoryForUser(user.getId()));
     }
 
     @Transactional(readOnly = true)
-    public List<TransferDtos.TransferResponse> findAll() {
-        return transferRepository.findAllHistory()
-                .stream().map(this::toResponse).toList();
+    public List<TransactionDtos.TransactionResponse> findAll() {
+        return combine(transferRepository.findAllHistory(), depositRepository.findAllHistory());
     }
 
-    private TransferDtos.TransferResponse toResponse(Transfer transfer) {
-        return new TransferDtos.TransferResponse(
+    private List<TransactionDtos.TransactionResponse> combine(List<Transfer> transfers, List<Deposit> deposits) {
+        List<TransactionDtos.TransactionResponse> transactions = new ArrayList<>();
+        transfers.stream().map(this::toTransferResponse).forEach(transactions::add);
+        deposits.stream().map(this::toDepositResponse).forEach(transactions::add);
+        transactions.sort(Comparator.comparing(TransactionDtos.TransactionResponse::createdAt).reversed());
+        return transactions;
+    }
+
+    private TransactionDtos.TransactionResponse toTransferResponse(Transfer transfer) {
+        return new TransactionDtos.TransactionResponse(
                 transfer.getReference(),
+                "TRANSFER",
+                null,
+                null,
                 transfer.getSenderAccount().getAccountNumber(),
                 transfer.getRecipientAccount().getAccountNumber(),
                 transfer.getAmount(), transfer.getCurrency(),
-                transfer.getStatus(), transfer.getCreatedAt());
+                transfer.getStatus().name(), transfer.getCreatedAt());
+    }
+
+    private TransactionDtos.TransactionResponse toDepositResponse(Deposit deposit) {
+        return new TransactionDtos.TransactionResponse(
+                deposit.getReference(),
+                "DEPOSIT",
+                deposit.getSource().name(),
+                deposit.getDescription(),
+                deposit.getAccount().getAccountNumber(),
+                null,
+                deposit.getAmount(), deposit.getCurrency(),
+                "COMPLETED", deposit.getCreatedAt());
     }
 }

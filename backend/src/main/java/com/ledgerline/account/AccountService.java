@@ -53,6 +53,11 @@ public class AccountService {
                 .stream().map(this::toResponse).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AccountDtos.AccountResponse> findAll() {
+        return accountRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
     @Transactional
     public AccountDtos.AccountResponse changeStatus(
             String accountNumber, AccountStatus requestedStatus, AppUser actor) {

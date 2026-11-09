@@ -34,6 +34,9 @@ public class AppUser {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @ManyToMany
     @JoinTable(
             name = "user_roles",
@@ -74,5 +77,18 @@ public class AppUser {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void replaceRole(Role role) {
+        roles.clear();
+        roles.add(role);
     }
 }
