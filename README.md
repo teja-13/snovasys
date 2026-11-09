@@ -7,8 +7,8 @@ double-entry bookkeeping, and an auditable transaction history.
 
 The backend foundation and initial PostgreSQL schema are implemented. The
 registration, login, JWT access-token authentication, rotating refresh-token
-sessions, and initial role authorization foundation are implemented. Account
-management, transfer APIs, frontend, and deployment are not implemented yet.
+sessions, account management, transfer APIs, frontend, and CI are implemented.
+AWS deployment is intentionally reserved for a later phase.
 
 ## Backend development
 
@@ -89,3 +89,21 @@ Administrative endpoints:
 The first administrator must be provisioned through a controlled database
 operation or deployment bootstrap process; public registration never grants
 privileged roles.
+
+## Continuous integration
+
+GitHub Actions runs the backend and frontend checks on pushes to `main` and on
+pull requests targeting `main`. Backend CI runs Maven verification against
+PostgreSQL and builds the application artifact. Frontend CI installs the locked
+npm dependency set, runs Oxlint, and creates the production Vite build.
+
+Equivalent local checks:
+
+```bash
+cd backend && ./mvnw --batch-mode verify
+cd ../frontend && npm ci && npm run lint && npm run build
+```
+
+The repository includes production-oriented Dockerfiles at
+`backend/Dockerfile` and `frontend/Dockerfile` for the future ECR/Kubernetes
+phase. Phase 1 does not publish images or access AWS.

@@ -2,7 +2,7 @@ name: Backend build and test
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -39,7 +39,7 @@ jobs:
           java-version: "25"
           cache: maven
 
-      - name: Run backend tests
+      - name: Verify and build backend
         run: ./mvnw --batch-mode verify
         env:
           DB_URL: jdbc:postgresql://localhost:5432/ledgerline
