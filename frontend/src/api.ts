@@ -1,3 +1,5 @@
+import { createUuidV4 } from './uuid'
+
 export type TokenResponse = {
   accessToken: string
   refreshToken: string
@@ -115,7 +117,7 @@ export const api = {
       '/api/transfers',
       {
         method: 'POST',
-        headers: { 'Idempotency-Key': crypto.randomUUID() },
+        headers: { 'Idempotency-Key': createUuidV4() },
         body: JSON.stringify(body),
       },
       token,
