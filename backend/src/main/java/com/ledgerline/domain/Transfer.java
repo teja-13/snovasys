@@ -62,4 +62,63 @@ public class Transfer {
 
     protected Transfer() {
     }
+
+    public Transfer(
+            String reference,
+            AppUser initiator,
+            Account senderAccount,
+            Account recipientAccount,
+            BigDecimal amount,
+            String idempotencyKey,
+            String requestFingerprint) {
+        this.reference = reference;
+        this.initiator = initiator;
+        this.senderAccount = senderAccount;
+        this.recipientAccount = recipientAccount;
+        this.amount = amount;
+        this.idempotencyKey = idempotencyKey;
+        this.requestFingerprint = requestFingerprint;
+        this.status = TransferStatus.PENDING;
+        this.createdAt = Instant.now();
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public Account getSenderAccount() {
+        return senderAccount;
+    }
+
+    public Account getRecipientAccount() {
+        return recipientAccount;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public String getRequestFingerprint() {
+        return requestFingerprint;
+    }
+
+    public TransferStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void complete() {
+        status = TransferStatus.COMPLETED;
+    }
 }

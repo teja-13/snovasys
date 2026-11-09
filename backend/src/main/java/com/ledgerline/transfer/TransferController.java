@@ -1,0 +1,42 @@
+package com.ledgerline.transfer;
+
+import com.ledgerline.domain.AppUser;
+import com.ledgerline.repository.AppUserRepository;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/transfers")
+public class TransferController {
+
+    private final TransferService transferService;
+    private final AppUserRepository userRepository;
+
+    public TransferController(TransferService transferService, AppUserRepository userRepository) {
+        this.transferService = transferService;
+        this.userRepository = userRepository;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public TransferDtos.TransferResponse transfer(
+            @Valid @RequestBody TransferDtos.CreateTransferRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            Authentication authentication) {
+        return transferService.transfer(request, idempotencyKey, currentUser(authentication));
+    }
+
+    private AppUser currentUser(Authentication authentication) {
+        return userRepository.findById(java.util.UUID.fromString(authentication.getName()))
+                .orElseThrow(() -> new IllegalStateException("Authenticated user was not found"));
+    }
+}

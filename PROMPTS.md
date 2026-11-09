@@ -140,3 +140,18 @@ project history and must not claim work that was not performed.
   schema validation completed, and `./mvnw --batch-mode verify` passed with 7
   tests and zero failures or errors.
 - **Commit reference:** Pending CI schema-fix commit.
+
+## Entry 9 — 2026-11-09 — Atomic internal transfers
+
+- **Developer request:** Continue to the next core LedgerLine feature after
+  schema validation passed.
+- **AI contribution:** Implemented the internal transfer service and endpoint,
+  deterministic pessimistic account locking, ownership and ACTIVE-status
+  validation, stored-balance debit/credit updates, immutable debit and credit
+  ledger entries, per-user idempotency fingerprint checks, and transfer audit
+  records. Added API error responses and PostgreSQL-backed integration tests.
+- **Verification or correction:** Initial integration tests found that a
+  `TX-` prefix made the UUID reference exceed the existing `VARCHAR(36)`
+  schema limit. The prefix was removed rather than expanding the schema
+  unnecessarily. Full `./mvnw --batch-mode verify` then passed with 10 tests.
+- **Commit reference:** Pending transfer commit.

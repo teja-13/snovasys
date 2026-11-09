@@ -79,4 +79,15 @@ public class Account {
     public void changeStatus(AccountStatus status) {
         this.status = status;
     }
+
+    public void debit(BigDecimal amount) {
+        if (balance.compareTo(amount) < 0) {
+            throw new IllegalStateException("Insufficient funds");
+        }
+        balance = balance.subtract(amount);
+    }
+
+    public void credit(BigDecimal amount) {
+        balance = balance.add(amount);
+    }
 }

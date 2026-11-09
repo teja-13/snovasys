@@ -41,3 +41,13 @@ Authentication endpoints:
 
 New registrations receive only the `CUSTOMER` role. Administrative and auditor
 roles must be assigned through an authorized administrative workflow.
+
+Internal transfers:
+
+- `POST /api/transfers`
+- Requires a customer JWT and an `Idempotency-Key` header.
+- Transfers lock both accounts in deterministic order, update both balances,
+  create one debit and one credit ledger entry, and write an audit record in
+  one database transaction.
+- Reusing an idempotency key with different transfer data returns `409
+  Conflict`.

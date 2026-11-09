@@ -62,7 +62,7 @@ public class AccountController {
     }
 
     private AppUser currentUser(Authentication authentication) {
-        return userRepository.findByEmailIgnoreCase(authentication.getName())
+        return userRepository.findById(java.util.UUID.fromString(authentication.getName()))
                 .orElseThrow(() -> new IllegalStateException("Authenticated user was not found"));
     }
 }

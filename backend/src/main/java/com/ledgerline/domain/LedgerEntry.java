@@ -46,4 +46,12 @@ public class LedgerEntry {
 
     protected LedgerEntry() {
     }
+
+    public LedgerEntry(Transfer transfer, Account account, LedgerEntryType entryType, BigDecimal amount) {
+        this.transfer = transfer;
+        this.account = account;
+        this.entryType = entryType;
+        this.amount = amount;
+        this.createdAt = Instant.now();
+    }
 }
