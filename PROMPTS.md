@@ -86,3 +86,22 @@ project history and must not claim work that was not performed.
   running PostgreSQL instance; local Docker availability must be restored
   before it can pass locally. The CI workflow supplies that dependency.
 - **Commit reference:** Pending first repository commit and push.
+
+## Entry 6 — 2026-11-09 — Authentication and rotating sessions
+
+- **Developer request:** Continue after the repository was pushed and implement
+  the next step with JWT authentication, short-lived access tokens, rotating
+  refresh tokens, secure password hashing, logout revocation, and backend role
+  enforcement.
+- **AI contribution:** Added registration, login, refresh, and logout endpoints;
+  BCrypt password hashing; SHA-256 hashes for database refresh-token storage;
+  seven-day refresh-token rotation; 15-minute JWT access tokens; JWT resource
+  server configuration; and CUSTOMER/ADMIN/AUDITOR authority mapping.
+- **Developer decisions:** Refresh tokens are stored as hashes and revoked on
+  use. New registrations receive only CUSTOMER and cannot self-assign
+  privileged roles.
+- **Verification or correction:** Compilation initially exposed an incorrect
+  Nimbus JWT encoder call and a missing `HexFormat` import; both were corrected.
+  Focused password and refresh-token lifecycle tests were added. Full
+  PostgreSQL-backed context testing still depends on a running database.
+- **Commit reference:** Pending authentication commit.

@@ -56,6 +56,14 @@ public class AppUser {
         return id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
