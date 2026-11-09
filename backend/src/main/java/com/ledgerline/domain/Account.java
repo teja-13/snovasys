@@ -55,4 +55,28 @@ public class Account {
     public UUID getId() {
         return id;
     }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public AppUser getOwner() {
+        return owner;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void changeStatus(AccountStatus status) {
+        this.status = status;
+    }
 }

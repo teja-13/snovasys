@@ -41,4 +41,13 @@ public class AuditLog {
 
     protected AuditLog() {
     }
+
+    public AuditLog(AppUser actor, String action, String resourceType, String resourceId, String details) {
+        this.actor = actor;
+        this.action = action;
+        this.resourceType = resourceType;
+        this.resourceId = resourceId;
+        this.details = details;
+        this.createdAt = Instant.now();
+    }
 }

@@ -106,3 +106,19 @@ project history and must not claim work that was not performed.
   PostgreSQL-backed context testing still depends on a running database.
 - **Commit reference:** `9df47e8 feat: add JWT authentication and roles` (local;
   push requires GitHub authentication in this environment).
+
+## Entry 7 — 2026-11-09 — Account management design
+
+- **Developer request:** Continue with account management and define the public
+  account-number format.
+- **Developer decision:** Account numbers use `LL` followed by 12 random
+  digits. They are 14-character public identifiers, generated with a
+  cryptographically secure generator, protected by a database unique
+  constraint, and never reused after closure.
+- **AI contribution:** Implemented customer account creation, admin account
+  creation on behalf of an existing customer, the three-account limit,
+  ownership listing, admin status changes, zero-balance closure validation,
+  and audit records for account creation and status changes.
+- **Verification or correction:** Added a format contract test. Database-backed
+  account service tests remain part of the next validation pass.
+- **Commit reference:** Pending account-management commit.
