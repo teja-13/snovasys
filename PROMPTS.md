@@ -168,3 +168,18 @@ project history and must not claim work that was not performed.
 - **Verification:** The full `./mvnw --batch-mode verify` command passed with
   10 tests and zero failures or errors.
 - **Commit reference:** Pending history and audit commit.
+
+## Entry 11 — 2026-11-09 — React frontend integration
+
+- **Developer request:** Integrate the existing backend with a frontend and
+  create the LedgerLine frontend.
+- **AI contribution:** Scaffolded a React/TypeScript Vite frontend with login
+  and registration, JWT session persistence, account overview, account
+  creation, transfer form with idempotency keys, transaction history, and
+  admin/auditor audit-log display. Added a typed fetch API client and backend
+  CORS configuration.
+- **Verification or correction:** TypeScript's strict
+  `verbatimModuleSyntax` and `erasableSyntaxOnly` settings exposed import and
+  parameter-property issues; those were corrected. Added a separate frontend
+  GitHub Actions build workflow.
+- **Commit reference:** Pending frontend integration commit.

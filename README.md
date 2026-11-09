@@ -42,6 +42,28 @@ Authentication endpoints:
 New registrations receive only the `CUSTOMER` role. Administrative and auditor
 roles must be assigned through an authorized administrative workflow.
 
+## Frontend development
+
+Requirements: Node.js 22 and npm.
+
+From `frontend/`:
+
+```bash
+npm ci
+npm run dev
+```
+
+The frontend expects the backend at `http://localhost:8080` by default. Set
+`VITE_API_URL` when the backend is hosted elsewhere:
+
+```bash
+VITE_API_URL=https://your-backend.example.com npm run build
+```
+
+The backend permits `http://localhost:5173` by default. Set
+`CORS_ALLOWED_ORIGINS` to the deployed frontend origin in deployed
+environments.
+
 Internal transfers:
 
 - `POST /api/transfers`
