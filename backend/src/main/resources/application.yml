@@ -48,6 +48,6 @@ management:
         enabled: true
       group:
         readiness:
-          include: readinessState,db,flyway
+          include: readinessState,db
         liveness:
           include: livenessState
