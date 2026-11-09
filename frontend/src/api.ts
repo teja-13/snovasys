@@ -33,6 +33,14 @@ export type AuditLog = {
   details: string
 }
 
+export type User = {
+  id: string
+  fullName: string
+  email: string
+  roles: string[]
+  createdAt: string
+}
+
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 
 export class ApiError extends Error {
@@ -89,6 +97,11 @@ export const api = {
   accounts: (token: string) => request<Account[]>('/api/accounts', {}, token),
   createAccount: (token: string) =>
     request<Account>('/api/accounts', { method: 'POST' }, token),
+  changeAccountStatus: (token: string, accountNumber: string, status: Account['status']) =>
+    request<Account>(`/api/accounts/${accountNumber}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    }, token),
   transfers: (token: string) => request<Transfer[]>('/api/transfers', {}, token),
   transfer: (
     token: string,
@@ -108,4 +121,10 @@ export const api = {
       token,
     ),
   auditLogs: (token: string) => request<AuditLog[]>('/api/audit-logs', {}, token),
+  users: (token: string) => request<User[]>('/api/admin/users', {}, token),
+  assignRole: (token: string, email: string, role: string) =>
+    request<User>(`/api/admin/users/${encodeURIComponent(email)}/roles`, {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    }, token),
 }

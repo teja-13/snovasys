@@ -199,6 +199,20 @@ project history and must not claim work that was not performed.
   controlled admin bootstrap/role assignment and reversal lifecycle behavior.
 - **Commit reference:** Pending backend completion commit.
 
+## Entry 14 — 2026-11-09 — Frontend completion pass
+
+- **Developer request:** Complete the frontend while keeping the backend work
+  already implemented.
+- **AI contribution:** Added frontend integration for account status changes,
+  admin user listing and role assignment, reliable sent/received transaction
+  direction detection, and typed API methods for the new backend endpoints.
+  Existing authentication, accounts, transfers, audit logs, responsive layout,
+  and frontend CI were preserved.
+- **Verification:** `npm run build` passed. `npm run lint` passed with one
+  existing React advisory about asynchronous state loading in the dashboard;
+  no lint errors were reported.
+- **Commit reference:** Pending frontend completion commit.
+
 ## Entry 13 — 2026-11-09 — Administrative role management
 
 - **Developer context:** Continue backend completion while postponing frontend
