@@ -26,6 +26,7 @@ export type Transfer = {
   createdAt: string
 }
 
+
 export type DepositSource =
   | 'SALARY'
   | 'SAVINGS'
