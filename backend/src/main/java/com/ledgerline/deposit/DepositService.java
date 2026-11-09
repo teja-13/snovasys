@@ -12,6 +12,9 @@ import com.ledgerline.repository.AuditLogRepository;
 import com.ledgerline.repository.DepositRepository;
 import com.ledgerline.repository.LedgerEntryRepository;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,11 +43,12 @@ public class DepositService {
         if (idempotencyKey == null || idempotencyKey.isBlank() || idempotencyKey.length() > 128) {
             throw new IllegalArgumentException("A valid Idempotency-Key header is required");
         }
+        String fingerprint = fingerprint(request);
         var existing = depositRepository.findByInitiatorIdAndIdempotencyKeyForUpdate(
                 initiator.getId(), idempotencyKey);
         if (existing.isPresent()) {
             Deposit deposit = existing.get();
-            if (!matches(deposit, request)) {
+            if (!deposit.getRequestFingerprint().equals(fingerprint)) {
                 throw new IllegalStateException("Idempotency key was reused with different deposit data");
             }
             return toResponse(deposit);
@@ -61,7 +65,7 @@ public class DepositService {
 
         Deposit deposit = new Deposit(
                 UUID.randomUUID().toString(), initiator, account, request.amount(),
-                request.source(), normalizeDescription(request.description()), idempotencyKey);
+                request.source(), normalizeDescription(request.description()), idempotencyKey, fingerprint);
         account.credit(request.amount());
         Deposit saved = depositRepository.save(deposit);
         ledgerEntryRepository.save(new LedgerEntry(saved, account, LedgerEntryType.CREDIT, request.amount()));
@@ -71,15 +75,20 @@ public class DepositService {
         return toResponse(saved);
     }
 
-    private boolean matches(Deposit deposit, DepositDtos.CreateDepositRequest request) {
-        return deposit.getAccount().getAccountNumber().equals(request.accountNumber())
-                && deposit.getAmount().compareTo(request.amount()) == 0
-                && deposit.getSource() == request.source()
-                && java.util.Objects.equals(deposit.getDescription(), normalizeDescription(request.description()));
-    }
-
     private String normalizeDescription(String description) {
         return description == null || description.isBlank() ? null : description.trim();
+    }
+
+    private String fingerprint(DepositDtos.CreateDepositRequest request) {
+        String data = request.accountNumber() + "|" + request.amount().toPlainString()
+                + "|" + request.source().name() + "|" + String.valueOf(normalizeDescription(request.description()))
+                + "|INR";
+        try {
+            return java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                    .digest(data.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is unavailable", exception);
+        }
     }
 
     private DepositDtos.DepositResponse toResponse(Deposit deposit) {

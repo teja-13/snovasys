@@ -85,6 +85,7 @@ public class Account {
     }
 
     public void debit(BigDecimal amount) {
+        validateAmount(amount);
         if (balance.compareTo(amount) < 0) {
             throw new IllegalStateException("Insufficient funds");
         }
@@ -92,6 +93,13 @@ public class Account {
     }
 
     public void credit(BigDecimal amount) {
+        validateAmount(amount);
         balance = balance.add(amount);
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0 || amount.scale() > 2) {
+            throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
+        }
     }
 }

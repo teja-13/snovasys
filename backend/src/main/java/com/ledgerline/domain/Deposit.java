@@ -47,6 +47,9 @@ public class Deposit {
     @Column(nullable = false, length = 128)
     private String idempotencyKey;
 
+    @Column(nullable = false, length = 64)
+    private String requestFingerprint;
+
     @Column(nullable = false, length = 3)
     private String currency = "INR";
 
@@ -63,7 +66,8 @@ public class Deposit {
             BigDecimal amount,
             DepositSource source,
             String description,
-            String idempotencyKey) {
+            String idempotencyKey,
+            String requestFingerprint) {
         this.reference = reference;
         this.initiator = initiator;
         this.account = account;
@@ -71,6 +75,7 @@ public class Deposit {
         this.source = source;
         this.description = description;
         this.idempotencyKey = idempotencyKey;
+        this.requestFingerprint = requestFingerprint;
         this.createdAt = Instant.now();
     }
 
@@ -100,6 +105,10 @@ public class Deposit {
 
     public String getIdempotencyKey() {
         return idempotencyKey;
+    }
+
+    public String getRequestFingerprint() {
+        return requestFingerprint;
     }
 
     public String getCurrency() {

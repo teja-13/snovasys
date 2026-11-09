@@ -73,6 +73,12 @@ Internal transfers:
   one database transaction.
 - Reusing an idempotency key with different transfer data returns `409
   Conflict`.
+- Idempotency keys are scoped to the authenticated user and fingerprint the
+  complete request. Deposits follow the same exact-retry/mismatched-reuse
+  contract.
+- Amounts must be positive INR values with at most two fractional digits.
+  Deterministic account locking prevents opposite-direction deadlocks and
+  double-spending.
 
 Read-only history and audit endpoints:
 
@@ -106,6 +112,16 @@ deployment URLs when they differ from localhost, then run:
 docker compose up -d --build
 ```
 
+Safe unauthenticated probes are available at
+`/actuator/health/liveness` and `/actuator/health/readiness`. Responses never
+include credentials, connection details, balances, or other financial data.
+Readiness includes PostgreSQL and Flyway.
+
+Redis is optional auxiliary infrastructure. Set
+`LEDGERLINE_REDIS_ENABLED=true` and `REDIS_URL` to enable its client/health
+integration; PostgreSQL remains authoritative for balances, ledger entries,
+and audit history. Redis outage must not trigger destructive data operations.
+
 ## Continuous integration
 
 GitHub Actions runs the backend and frontend checks on pushes to `main` and on
@@ -119,6 +135,9 @@ Equivalent local checks:
 cd backend && ./mvnw --batch-mode verify
 cd ../frontend && npm ci && npm run lint && npm run build
 ```
+
+Use only forward Flyway migrations for schema changes. Never reset persistent
+volumes or use destructive database commands in local or deployed environments.
 
 The repository includes production-oriented Dockerfiles at
 `backend/Dockerfile` and `frontend/Dockerfile` for the future ECR/Kubernetes

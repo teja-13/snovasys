@@ -2,6 +2,7 @@ package com.ledgerline.deposit;
 
 import com.ledgerline.domain.DepositSource;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,7 +16,7 @@ public final class DepositDtos {
 
     public record CreateDepositRequest(
             @NotBlank String accountNumber,
-            @NotNull @DecimalMin(value = "0.01") BigDecimal amount,
+            @NotNull @DecimalMin(value = "0.01") @Digits(integer = 17, fraction = 2) BigDecimal amount,
             @NotNull DepositSource source,
             @Size(max = 500) String description) {
     }
