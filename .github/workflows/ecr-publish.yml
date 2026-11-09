@@ -1,0 +1,134 @@
+name: Publish images to Amazon ECR
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ap-southeast-2
+
+jobs:
+  validate-backend:
+    name: Validate backend
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: ledgerline
+          POSTGRES_USER: ledgerline
+          POSTGRES_PASSWORD: ledgerline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ledgerline -d ledgerline"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Verify backend
+        run: ./mvnw --batch-mode verify
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/ledgerline
+          DB_USERNAME: ledgerline
+          DB_PASSWORD: ledgerline
+
+  validate-frontend:
+    name: Validate frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+  publish:
+    name: Build and publish ECR images
+    runs-on: ubuntu-latest
+    needs: [validate-backend, validate-frontend]
+    env:
+      BACKEND_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+      FRONTEND_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get AWS account ID
+        id: aws-account
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BACKEND_REPOSITORY"
+          test -n "$FRONTEND_REPOSITORY"
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          test -n "$account_id"
+          echo "account-id=$account_id" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build backend image
+        env:
+          IMAGE_URI: ${{ steps.aws-account.outputs.account-id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.BACKEND_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        run: docker build --tag "$IMAGE_URI" --file backend/Dockerfile backend
+
+      - name: Push backend image
+        env:
+          IMAGE_URI: ${{ steps.aws-account.outputs.account-id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.BACKEND_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        run: docker push "$IMAGE_URI"
+
+      - name: Build frontend image
+        env:
+          IMAGE_URI: ${{ steps.aws-account.outputs.account-id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.FRONTEND_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        run: docker build --tag "$IMAGE_URI" --file frontend/Dockerfile frontend
+
+      - name: Push frontend image
+        env:
+          IMAGE_URI: ${{ steps.aws-account.outputs.account-id }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.FRONTEND_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        run: docker push "$IMAGE_URI"
+
+      - name: Report published image references
+        run: |
+          echo "Published backend image with tag ${IMAGE_TAG}"
+          echo "Published frontend image with tag ${IMAGE_TAG}"
