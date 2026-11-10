@@ -156,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           deployment_script="$(cat <<EOF
-          set -e
+          set -euo pipefail
           cd /home/ubuntu/ledgerline
           tag='${IMAGE_TAG}'
           if grep -q '^LEDGERLINE_IMAGE_TAG=' .env; then
@@ -164,6 +164,10 @@ jobs:
           else
             printf '\nLEDGERLINE_IMAGE_TAG=%s\n' "\${tag}" >> .env
           fi
+          aws ecr get-login-password --region ap-southeast-2 \
+            | docker login \
+                --username AWS \
+                --password-stdin 051131628807.dkr.ecr.ap-southeast-2.amazonaws.com
           docker compose pull backend frontend
           docker compose up -d --no-deps backend frontend
           docker compose ps --status running --services | grep -qx backend
