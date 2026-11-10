@@ -1,4 +1,4 @@
-# LedgerLine DevOps
+# BalanceVault DevOps
 
 ## Phase 1: continuous integration
 

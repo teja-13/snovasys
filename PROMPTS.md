@@ -1,13 +1,13 @@
-# LedgerLine AI-Assisted Development Ledger
+# BalanceVault AI-Assisted Development Ledger
 
 This file records meaningful AI-assisted development interactions for
-LedgerLine. Entries describe what was requested, what was implemented, what
+BalanceVault. Entries describe what was requested, what was implemented, what
 was verified, and what remains uncertain. It is maintained as part of the
 project history and must not claim work that was not performed.
 
 ## Entry 1 — 2026-11-09 — Initial project direction
 
-- **Developer request:** Build LedgerLine as a secure financial transaction
+- **Developer request:** Build BalanceVault as a secure financial transaction
   management system with user accounts, internal transfers, double-entry
   bookkeeping, role-based permissions, auditability, error handling, testing,
   and professional DevOps practices.
@@ -143,7 +143,7 @@ project history and must not claim work that was not performed.
 
 ## Entry 9 — 2026-11-09 — Atomic internal transfers
 
-- **Developer request:** Continue to the next core LedgerLine feature after
+- **Developer request:** Continue to the next core BalanceVault feature after
   schema validation passed.
 - **AI contribution:** Implemented the internal transfer service and endpoint,
   deterministic pessimistic account locking, ownership and ACTIVE-status
@@ -159,7 +159,7 @@ project history and must not claim work that was not performed.
 ## Entry 10 — 2026-11-09 — History and audit access
 
 - **Developer context:** Confirmed that the BalanceVault description is
-  reference material while LedgerLine must use its independently agreed Java,
+  reference material while BalanceVault must use its independently agreed Java,
   Spring Boot, PostgreSQL, and financial-integrity design.
 - **AI contribution:** Added customer transfer-history queries restricted by
   account ownership, complete transfer-history access for admins and
@@ -172,7 +172,7 @@ project history and must not claim work that was not performed.
 ## Entry 11 — 2026-11-09 — React frontend integration
 
 - **Developer request:** Integrate the existing backend with a frontend and
-  create the LedgerLine frontend.
+  create the BalanceVault frontend.
 - **AI contribution:** Scaffolded a React/TypeScript Vite frontend with login
   and registration, JWT session persistence, account overview, account
   creation, transfer form with idempotency keys, transaction history, and

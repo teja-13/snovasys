@@ -71,10 +71,10 @@ function AuthScreen({ onAuthenticated }: { onAuthenticated: (tokens: TokenRespon
   return (
     <main className="auth-shell">
       <section className="auth-card">
-        <div className="brand-mark">LL</div>
+        <div className="brand-mark">BV</div>
         <p className="eyebrow">SECURE LEDGER PLATFORM</p>
         <h1>{registering ? 'Open your account' : 'Welcome back'}</h1>
-        <p className="muted">{registering ? 'Start with a secure INR account.' : 'Sign in to manage your LedgerLine accounts.'}</p>
+        <p className="muted">{registering ? 'Start with a secure INR account.' : 'Sign in to manage your BalanceVault accounts.'}</p>
         <form onSubmit={submit}>
           {registering && <label>Full name<input required value={fullName} onChange={(event) => setFullName(event.target.value)} /></label>}
           <label>Email<input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} /></label>
@@ -83,7 +83,7 @@ function AuthScreen({ onAuthenticated }: { onAuthenticated: (tokens: TokenRespon
           <button disabled={busy}>{busy ? 'Please wait…' : registering ? 'Create account' : 'Sign in'}</button>
         </form>
         <button className="link-button" onClick={() => setRegistering(!registering)}>
-          {registering ? 'Already registered? Sign in' : 'New to LedgerLine? Register'}
+          {registering ? 'Already registered? Sign in' : 'New to BalanceVault? Register'}
         </button>
       </section>
     </main>
@@ -238,7 +238,7 @@ function Dashboard({ session, onLogout }: { session: Session; onLogout: () => vo
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand"><span className="brand-mark small">LL</span><strong>LedgerLine</strong></div>
+        <div className="brand"><span className="brand-mark small">BV</span><strong>BalanceVault</strong></div>
         <div className="topbar-actions"><span className="role-pill">{session.roles.join(' · ')}</span><button className="ghost-button" onClick={onLogout}>Sign out</button></div>
       </header>
       <main className="dashboard">

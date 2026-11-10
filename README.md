@@ -1,14 +1,68 @@
-# LedgerLine
+# BalanceVault
 
 Secure financial transaction management system with role-based access control,
 double-entry bookkeeping, and an auditable transaction history.
+
+## Live application
+
+BalanceVault is deployed on AWS and is available at:
+
+**http://16.178.222.175/**
 
 ## Current status
 
 The backend foundation and initial PostgreSQL schema are implemented. The
 registration, login, JWT access-token authentication, rotating refresh-token
 sessions, account management, transfer APIs, frontend, and CI are implemented.
-AWS deployment is intentionally reserved for a later phase.
+The production deployment uses Docker Compose on AWS EC2 with PostgreSQL,
+Redis, Spring Boot, and the React frontend behind Nginx.
+
+## Start locally
+
+Requirements: Docker Desktop or Docker Engine with Compose, Java 25, Maven (or
+the included Maven wrapper), Node.js 22, and npm.
+
+1. Copy the example environment file and set local development values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Keep `.env` local and never commit it. The example values are placeholders;
+   use strong, unique values for `POSTGRES_PASSWORD` and `JWT_SECRET`.
+
+2. Start the local PostgreSQL, Redis, backend, and frontend services:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. Open the application at [http://localhost](http://localhost). The frontend
+   proxies `/api/` requests to the backend.
+
+4. Verify service health:
+
+   ```bash
+   curl http://localhost/actuator/health/liveness
+   curl http://localhost/actuator/health/readiness
+   ```
+
+To run the backend and frontend outside Compose, start PostgreSQL and Redis
+first, then use:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+
+# In another terminal:
+cd frontend
+npm ci
+npm run dev
+```
+
+The Vite development server is available at
+[http://localhost:5173](http://localhost:5173). Set `VITE_API_URL` only when
+the backend is not available at the configured default.
 
 ## Backend development
 
@@ -95,6 +149,17 @@ Administrative endpoints:
 The first administrator must be provisioned through a controlled database
 operation or deployment bootstrap process; public registration never grants
 privileged roles.
+
+To create the first administrator locally, add
+`LEDGERLINE_BOOTSTRAP_ADMIN_FULL_NAME`, `LEDGERLINE_BOOTSTRAP_ADMIN_EMAIL`, and
+`LEDGERLINE_BOOTSTRAP_ADMIN_PASSWORD` to the untracked `.env`, then recreate
+only the backend with `docker compose up -d backend`. The bootstrap is
+one-time: after the first administrator exists, changing these values does not
+create another administrator. Log in through `POST /api/auth/login` or the
+frontend with that email and password. Once logged in as an admin, create an
+auditor from the admin UI or `POST /api/admin/auditors`; the request requires
+`Authorization: Bearer <admin-access-token>` and a full name, email, and
+temporary password.
 
 ## Docker Compose deployment
 
